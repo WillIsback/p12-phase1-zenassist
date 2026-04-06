@@ -1,0 +1,15 @@
+# Env files
+.venv
+.vscode
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Project file
+context
+data
+
+AGENTS.md
