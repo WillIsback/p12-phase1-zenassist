@@ -11,5 +11,7 @@ __pycache__/
 # Project file
 context
 data
+output/*.json
+output/*.pkl
 
 AGENTS.md

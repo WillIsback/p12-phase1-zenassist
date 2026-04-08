@@ -25,7 +25,7 @@ Ce notebook compare trois approches de classification en 11 catégories :
 
 ## Structure du dépôt
 
-```
+```text
 ├── p12.ipynb                  # Notebook principal (exploration → évaluation → rapport)
 ├── pyproject.toml             # Dépendances Python (uv)
 ├── projet12_phase1_zenassist.pptx  # Présentation des résultats
@@ -78,8 +78,43 @@ Placez `dataset.csv` dans le dossier `data/` avant d'exécuter le notebook.
 ## Livrables
 
 - **Notebook** : exploration des données, implémentation LLM / ML / ModernBERT, rapport comparatif
+- **Script d'export ML** : `main.py` — entraîne les modèles scikit-learn, sélectionne le meilleur et exporte les artefacts de release
 - **Présentation** : `projet12_phase1_zenassist.pptx` — slides de recommandation client
 - **Rapports** : analyse détaillée dans `docs/` et `report/`
+
+## Export du modèle ML
+
+Le dépôt contient un script versionné qui entraîne les classifieurs ML, sélectionne le meilleur modèle et exporte les artefacts de release au format pickle et JSON.
+
+Exécution locale :
+
+```bash
+python main.py \
+  --dataset data/dataset.csv \
+  --output-dir output \
+  --version local-test
+```
+
+Artefacts générés :
+
+- `output/best_ml_classifier.pkl` : classifieur sélectionné + TF-IDF vectorizer + LabelEncoder
+- `output/best_ml_metrics.json` : métriques, ranking des modèles et métadonnées du dataset
+
+## Release GitHub Actions
+
+Le workflow `.github/workflows/release-model.yml` permet de versionner les artefacts de modèle avec le code source.
+
+Fonctionnement :
+
+- déclenchement manuel via `workflow_dispatch` pour le debug
+- déclenchement automatique lors de la publication d'une release GitHub
+- exécution du script d'export
+- ajout du pickle et du JSON comme assets de release
+
+Pré-requis CI :
+
+- le workflow télécharge automatiquement le dataset public CFPB depuis OpenClassrooms
+- si le dataset ne peut pas être téléchargé, remplacer `ubuntu-latest` par un runner `self-hosted` ayant accès au CSV
 
 ## Auteur
 
