@@ -180,6 +180,7 @@ def export_artifacts(
     test_row_count: int,
     pickle_name: str,
     metrics_name: str,
+    label_consolidation_map: dict | None = None,
 ) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -191,7 +192,7 @@ def export_artifacts(
         "text_column": TEXT_COL,
         "target_column": TARGET_COL,
         "label_column": "label",
-        "label_consolidation_map": ML_LABEL_CONSOLIDATION_MAP,
+        "label_consolidation_map": label_consolidation_map or ML_LABEL_CONSOLIDATION_MAP,
         "selection_metrics": comparison_df.iloc[0].to_dict(),
         "version": version,
     }

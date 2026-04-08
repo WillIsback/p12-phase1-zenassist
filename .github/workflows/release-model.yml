@@ -35,11 +35,20 @@ jobs:
           mkdir -p data
           curl -L "$DATASET_URL" -o data/dataset.csv
 
-      - name: Export release artifacts
+      - name: Export consolidated-tags model
         env:
           MODEL_VERSION: ${{ github.event.release.tag_name || github.ref_name }}
         run: |
           python main.py \
+            --dataset data/dataset.csv \
+            --output-dir output \
+            --version "$MODEL_VERSION"
+
+      - name: Export client-tags model
+        env:
+          MODEL_VERSION: ${{ github.event.release.tag_name || github.ref_name }}
+        run: |
+          python main_client_tags.py \
             --dataset data/dataset.csv \
             --output-dir output \
             --version "$MODEL_VERSION"
@@ -51,6 +60,8 @@ jobs:
           path: |
             output/best_ml_classifier.pkl
             output/best_ml_metrics.json
+            output/best_ml_classifier_client.pkl
+            output/best_ml_metrics_client.json
 
       - name: Attach assets to GitHub release
         if: github.event_name == 'release'
@@ -59,3 +70,5 @@ jobs:
           files: |
             output/best_ml_classifier.pkl
             output/best_ml_metrics.json
+            output/best_ml_classifier_client.pkl
+            output/best_ml_metrics_client.json
