@@ -1,0 +1,61 @@
+name: Release ML Model
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  DATASET_URL: https://s3.eu-west-1.amazonaws.com/course.oc-static.com/projects/2464_D%C3%A9veloppeur_IA/P12/dataset.csv
+
+jobs:
+  export-model:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install project dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+
+      - name: Download dataset
+        run: |
+          mkdir -p data
+          curl -L "$DATASET_URL" -o data/dataset.csv
+
+      - name: Export release artifacts
+        env:
+          MODEL_VERSION: ${{ github.event.release.tag_name || github.ref_name }}
+        run: |
+          python main.py \
+            --dataset data/dataset.csv \
+            --output-dir output \
+            --version "$MODEL_VERSION"
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ml-model-${{ github.sha }}
+          path: |
+            output/best_ml_classifier.pkl
+            output/best_ml_metrics.json
+
+      - name: Attach assets to GitHub release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            output/best_ml_classifier.pkl
+            output/best_ml_metrics.json
